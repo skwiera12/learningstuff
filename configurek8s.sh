@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## add private ips for master and worker nodes
-sudo sed '/^127.0.0.1.*/a 10.0.0.5 k8smaster\n10.0.0.6 k8snode1\n10.0.0.7 k8snode2' /etc/hosts
+sudo sed -i '/^127.0.0.1.*/a 10.0.0.5 k8smaster\n10.0.0.6 k8snode1\n10.0.0.7 k8snode2' /etc/hosts
 
 ## on all nodes setup containerd
 cat << EOF | sudo tee /etc/modules-load.d/containerd.conf
@@ -37,13 +37,13 @@ sudo apt-get install -y kubelet=1.23.0-00 kubeadm=1.23.0-00 kubectl=1.23.0-00
 sudo apt-mark hold kubelet kubeadm kubectl
 
 ## On the control plane node only, initialize the cluster and set up kubectl access.
-## sudo kubeadm init --pod-network-cidr 192.168.0.0/16 --kubernetes-version 1.23.0
-## mkdir -p $HOME/.kube
-## sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-## sudo chown $(id -u):$(id -g) $HOME/.kube/config
+sudo kubeadm init --pod-network-cidr 10.0.0.0/16 --kubernetes-version 1.23.0
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ## On control plane install Calico network add-on
-## kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 ## Get token to join workers to cluster
 ## kubeadm token create --print-join-command
